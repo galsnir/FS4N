@@ -1,0 +1,62 @@
+﻿
+@{
+    ViewBag.Title = "displayAndSave";
+}
+
+<html>
+<head>
+</head>
+<body background="~/export-map-share.png" alt="Map" style="background-size:100% 100%; background-attachment:fixed; width:100%; height:100%; overflow:hidden">
+    <canvas id="canvas" style="width:100%; height:100%;"></canvas>
+    <script>
+
+        var flag = 1;
+        var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        context.canvas.width = window.innerWidth;
+        context.canvas.height = window.innerHeight;
+
+        var IntervalTime = @Session["frequency"] * 1000
+        var TimeOutTime = @Session["duration"] * 1000
+        myTimer = (function () {
+        $.post( "@Url.Action("ToXmlSave")").done(function (xml) {
+            var xmlDoc = $.parseXML(xml);
+            $xml = $(xmlDoc);
+
+            Lon = $xml.find("lon").text();
+            Lat = $xml.find("lat").text();
+            lon = parseFloat(Lon);
+            lat = parseFloat(Lat);
+            lon = (lon + 180) * (canvas.width / 360);
+            lat = (lat + 90) * (canvas.height / 180);
+            if (flag == 1)
+            {
+                prevLon = lon;
+                prevLat = lat;
+                context.lineWidth = 1;
+                context.beginPath();
+                context.arc(lon, lat, 6, 0, 2 * Math.PI);
+                context.fillStyle = "red";
+                context.fill();
+                context.stroke();
+                flag = 0;
+            }
+            context.strokeStyle = "red";
+            context.moveTo(prevLon, prevLat);
+            context.lineTo(lon,lat);
+            context.stroke();
+            prevLon = lon;
+            prevLat = lat;
+            });
+        });
+
+        var intervalId = setInterval(myTimer, IntervalTime);
+
+        endFunction = (function () {
+            clearInterval(intervalId);
+        });
+        setTimeout(endFunction, TimeOutTime);
+
+    </script>
+</body>
+</html>

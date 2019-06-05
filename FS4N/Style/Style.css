@@ -1,0 +1,7 @@
+﻿body {
+    background-image: url('/export-map-share.png');
+    background-size: 100% 100%;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
